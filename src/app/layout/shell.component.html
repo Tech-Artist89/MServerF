@@ -1,0 +1,28 @@
+<div class="app-container d-flex flex-column min-vh-100">
+  <nav class="navbar navbar-expand navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" routerLink="/">Mitra File Server</a>
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item"><a class="nav-link" routerLink="/dashboard">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link" routerLink="/projects">Projekte</a></li>
+        <li class="nav-item dropdown" *ngIf="(auth.me()?.is_staff) || (auth.me()?.profile?.role === 'admin')">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Admin</a>
+          <ul class="dropdown-menu dropdown-menu-dark">
+            <li><a class="dropdown-item" routerLink="/admin/users">Benutzer</a></li>
+            <li><a class="dropdown-item" routerLink="/admin/companies">Firmen</a></li>
+            <li><a class="dropdown-item" routerLink="/admin/projects">Projekte</a></li>
+            <li><a class="dropdown-item" routerLink="/admin/audit-logs">Audit-Logs</a></li>
+          </ul>
+        </li>
+      </ul>
+      <div class="d-flex" *ngIf="auth.isAuthenticated">
+        <span class="navbar-text me-3">{{ auth.me()?.username }}</span>
+        <button class="btn btn-outline-light btn-sm" (click)="auth.logout()">Logout</button>
+      </div>
+    </div>
+  </nav>
+  <main class="container my-4 flex-grow-1">
+    <router-outlet></router-outlet>
+  </main>
+  <app-toasts></app-toasts>
+</div>

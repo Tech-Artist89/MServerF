@@ -1,0 +1,9 @@
+/* Styles for DashboardComponent */
+
+.list-group-item {
+  transition: transform .06s ease;
+}
+.list-group-item:hover {
+  transform: translateX(2px);
+}
+

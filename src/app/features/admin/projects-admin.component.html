@@ -1,0 +1,67 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>Projekte</h2>
+  <button class="btn btn-primary" (click)="creating = !creating"><i class="bi bi-plus-lg"></i> Neu</button>
+</div>
+
+<div class="card bg-dark border-secondary mb-3" *ngIf="creating">
+  <div class="card-body">
+    <div class="row g-2 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label">Name</label>
+        <input class="form-control" [(ngModel)]="form.name">
+      </div>
+      <div class="col-md-5">
+        <label class="form-label">Beschreibung</label>
+        <input class="form-control" [(ngModel)]="form.description">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Eigentümer-Firma</label>
+        <select class="form-select" [(ngModel)]="form.owner_company">
+          <option [ngValue]="null" disabled>Bitte wählen</option>
+          <option *ngFor="let c of companies" [ngValue]="c.id">{{ c.name }}</option>
+        </select>
+      </div>
+      <div class="col-12 text-end">
+        <button class="btn btn-success me-2" (click)="create()" [disabled]="!form.name || !form.owner_company">Speichern</button>
+        <button class="btn btn-outline-light" (click)="creating=false">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-2 mb-2">
+  <div class="col-md-6">
+    <input class="form-control" placeholder="Suchen (Name/Beschreibung)" [(ngModel)]="q" (ngModelChange)="page=1">
+  </div>
+  <div class="col-md-3">
+    <select class="form-select" [(ngModel)]="pageSize" (ngModelChange)="page=1">
+      <option [ngValue]="10">10 pro Seite</option>
+      <option [ngValue]="25">25 pro Seite</option>
+      <option [ngValue]="50">50 pro Seite</option>
+    </select>
+  </div>
+  <div class="col-md-3 text-end">
+    <div class="btn-group" role="group">
+      <button class="btn btn-outline-light" (click)="page=Math.max(1,page-1)" [disabled]="page<=1">Zurück</button>
+      <span class="btn btn-outline-secondary disabled">Seite {{page}} / {{ totalPages }}</span>
+      <button class="btn btn-outline-light" (click)="page=Math.min(totalPages,page+1)" [disabled]="page>=totalPages">Weiter</button>
+    </div>
+  </div>
+</div>
+
+<table class="table table-dark table-striped align-middle">
+  <thead>
+    <tr><th>Name</th><th>Firma</th><th>Erstellt</th><th class="text-end">Aktionen</th></tr>
+  </thead>
+  <tbody>
+      <tr *ngFor="let p of filteredProjects">
+      <td>{{ p.name }}</td>
+      <td>{{ companyName(p.owner_company) }}</td>
+      <td>{{ p.created_at | date:'short' }}</td>
+      <td class="text-end">
+        <a class="btn btn-sm btn-outline-light me-2" [routerLink]="['/admin/projects', p.id]"><i class="bi bi-gear"></i> Verwalten</a>
+        <button class="btn btn-sm btn-outline-danger" (click)="remove(p)"><i class="bi bi-trash"></i></button>
+      </td>
+    </tr>
+  </tbody>
+</table>

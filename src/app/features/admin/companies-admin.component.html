@@ -1,0 +1,76 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>Firmen</h2>
+  <button class="btn btn-primary" (click)="startCreate()"><i class="bi bi-plus-lg"></i> Neu</button>
+</div>
+<div class="card bg-dark border-secondary mb-3" *ngIf="creating">
+  <div class="card-body">
+    <div class="row g-2 align-items-end">
+      <div class="col-md-5">
+        <label class="form-label">Name</label>
+        <input class="form-control" [(ngModel)]="form.name">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Typ</label>
+        <select class="form-select" [(ngModel)]="form.type">
+          <option value="internal">Intern</option>
+          <option value="subcontractor">Subunternehmer</option>
+        </select>
+      </div>
+      <div class="col-md-2 form-check">
+        <input id="active" type="checkbox" class="form-check-input" [(ngModel)]="form.active">
+        <label for="active" class="form-check-label">Aktiv</label>
+      </div>
+      <div class="col-md-2 text-end">
+        <button class="btn btn-success me-2" (click)="create()" [disabled]="!form.name">Speichern</button>
+        <button class="btn btn-outline-light" (click)="cancelCreate()">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-2 mb-2">
+  <div class="col-md-6">
+    <input class="form-control" placeholder="Suchen (Firmenname)" [(ngModel)]="q" (ngModelChange)="page=1">
+  </div>
+  <div class="col-md-3">
+    <select class="form-select" [(ngModel)]="pageSize" (ngModelChange)="page=1">
+      <option [ngValue]="10">10 pro Seite</option>
+      <option [ngValue]="25">25 pro Seite</option>
+      <option [ngValue]="50">50 pro Seite</option>
+    </select>
+  </div>
+  <div class="col-md-3 text-end">
+    <div class="btn-group" role="group">
+      <button class="btn btn-outline-light" (click)="page=Math.max(1,page-1)" [disabled]="page<=1">Zurück</button>
+      <span class="btn btn-outline-secondary disabled">Seite {{page}} / {{ totalPages }}</span>
+      <button class="btn btn-outline-light" (click)="page=Math.min(totalPages,page+1)" [disabled]="page>=totalPages">Weiter</button>
+    </div>
+  </div>
+</div>
+
+<table class="table table-dark table-striped align-middle">
+  <thead>
+    <tr><th>Name</th><th>Typ</th><th>Aktiv</th><th>Erstellt</th><th class="text-end">Aktionen</th></tr>
+  </thead>
+  <tbody>
+      <tr *ngFor="let c of filteredCompanies">
+      <td>
+        <input class="form-control form-control-sm bg-dark text-light border-secondary" [(ngModel)]="c.name">
+      </td>
+      <td>
+        <select class="form-select form-select-sm bg-dark text-light border-secondary" [(ngModel)]="c.type">
+          <option value="internal">Intern</option>
+          <option value="subcontractor">Subunternehmer</option>
+        </select>
+      </td>
+      <td>
+        <input type="checkbox" class="form-check-input" [(ngModel)]="c.active">
+      </td>
+      <td>{{ c.created_at | date:'short' }}</td>
+      <td class="text-end">
+        <button class="btn btn-sm btn-outline-success me-2" (click)="save(c)"><i class="bi bi-check-lg"></i></button>
+        <button class="btn btn-sm btn-outline-danger" (click)="remove(c)"><i class="bi bi-trash"></i></button>
+      </td>
+    </tr>
+  </tbody>
+</table>

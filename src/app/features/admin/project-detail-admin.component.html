@@ -1,0 +1,62 @@
+<h2>Projekt verwalten</h2>
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card bg-dark border-secondary">
+      <div class="card-header">Mitglieder (User)</div>
+      <div class="card-body">
+        <div class="row g-2 align-items-end mb-3">
+          <div class="col-7">
+            <label class="form-label">Benutzer</label>
+            <select class="form-select" [(ngModel)]="membershipForm.user">
+              <option [ngValue]="null" disabled>Wählen…</option>
+              <option *ngFor="let u of users" [ngValue]="u.id">{{ u.username }}</option>
+            </select>
+          </div>
+          <div class="col-2 form-check">
+            <input id="mwrite" type="checkbox" class="form-check-input" [(ngModel)]="membershipForm.can_write">
+            <label for="mwrite" class="form-check-label">Schreiben</label>
+          </div>
+          <div class="col-3 text-end">
+            <button class="btn btn-success" (click)="addMembership()" [disabled]="!membershipForm.user">Hinzufügen</button>
+          </div>
+        </div>
+        <ul class="list-group">
+          <li class="list-group-item bg-dark text-light border-secondary d-flex justify-content-between align-items-center" *ngFor="let m of memberships">
+            <span>{{ username(m.user) }} <small class="text-secondary">{{ m.can_write ? '(RW)' : '(R)' }}</small></span>
+            <button class="btn btn-sm btn-outline-danger" (click)="removeMembership(m)"><i class="bi bi-x-lg"></i></button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card bg-dark border-secondary">
+      <div class="card-header">Firmenzugriffe</div>
+      <div class="card-body">
+        <div class="row g-2 align-items-end mb-3">
+          <div class="col-7">
+            <label class="form-label">Firma</label>
+            <select class="form-select" [(ngModel)]="accessForm.company">
+              <option [ngValue]="null" disabled>Wählen…</option>
+              <option *ngFor="let c of companies" [ngValue]="c.id">{{ c.name }}</option>
+            </select>
+          </div>
+          <div class="col-2 form-check">
+            <input id="awrite" type="checkbox" class="form-check-input" [(ngModel)]="accessForm.can_write">
+            <label for="awrite" class="form-check-label">Schreiben</label>
+          </div>
+          <div class="col-3 text-end">
+            <button class="btn btn-success" (click)="addAccess()" [disabled]="!accessForm.company">Hinzufügen</button>
+          </div>
+        </div>
+        <ul class="list-group">
+          <li class="list-group-item bg-dark text-light border-secondary d-flex justify-content-between align-items-center" *ngFor="let a of access">
+            <span>{{ companyName(a.company) }} <small class="text-secondary">{{ a.can_write ? '(RW)' : '(R)' }}</small></span>
+            <button class="btn btn-sm btn-outline-danger" (click)="removeAccess(a)"><i class="bi bi-x-lg"></i></button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+

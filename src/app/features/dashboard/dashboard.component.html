@@ -1,0 +1,11 @@
+<h2 class="mb-3">Dashboard</h2>
+<p class="text-secondary">Letzte Projekte</p>
+<ul class="list-group">
+  <li class="list-group-item bg-dark text-light border-secondary" *ngFor="let p of projects">
+    <a [routerLink]="['/projects', p.id]" class="link-light text-decoration-none">
+      <i class="bi bi-folder2"></i> {{ p.name }}
+    </a>
+  </li>
+  
+</ul>
+

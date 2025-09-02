@@ -1,0 +1,10 @@
+/* Styles for FileBrowserComponent */
+
+.btn-group .btn + .btn, .btn-group .btn + label.btn {
+  margin-left: .25rem;
+}
+
+.list-group-item {
+  border-radius: .5rem;
+}
+
