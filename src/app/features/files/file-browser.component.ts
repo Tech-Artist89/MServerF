@@ -2,9 +2,10 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { ToastService } from '../../shared/toast.service';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-file-browser',
@@ -17,9 +18,12 @@ export class FileBrowserComponent implements OnInit {
   private http = inject(HttpClient);
   private auth = inject(AuthService);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private location = inject(Location);
   private toast = inject(ToastService);
 
   projectId!: string;
+  projectName = '';
   files: any[] = [];
   folders: any[] = [];
   selectedFolderId: number | null = null;
@@ -28,18 +32,50 @@ export class FileBrowserComponent implements OnInit {
   pageSize = 10;
   Math = Math;
   viewTrash = false;
+  isSharedAccess = false;
   // Rename modal state
   renameTarget: any = null;
   renameName = '';
 
   ngOnInit() {
     this.projectId = this.route.snapshot.paramMap.get('id')!;
+    
+    // Check if this is shared access from route data or URL
+    this.isSharedAccess = this.route.snapshot.data['shared'] === true || 
+                         this.route.snapshot.url.some(segment => segment.path === 'shared');
+    
+    this.loadProject();
     this.loadFolders();
     this.loadFiles();
   }
 
+  loadProject() {
+    this.http.get<any>(`${this.auth.apiBase()}/projects/${this.projectId}/`).subscribe({
+      next: (project) => {
+        this.projectName = project.name || 'Projekt';
+      },
+      error: () => {}
+    });
+  }
+
+  goBack() {
+    // Navigate back to the appropriate view based on access type
+    if (this.isSharedAccess) {
+      this.router.navigate(['/shared']);
+    } else {
+      this.router.navigate(['/projects']);
+    }
+  }
+
   loadFolders() {
-    this.http.get<any[]>(`${this.auth.apiBase()}/folders/?project=${this.projectId}`).subscribe({
+    let endpoint = `${this.auth.apiBase()}/folders/?project=${this.projectId}`;
+    
+    // If accessing through shared route, only load externally shared folders
+    if (this.isSharedAccess) {
+      endpoint += '&shared_external=true';
+    }
+    
+    this.http.get<any[]>(endpoint).subscribe({
       next: (list) => {
         this.folders = list || [];
         // Standard: Ersten Ordner vorselektieren, falls keiner gewählt
@@ -53,7 +89,17 @@ export class FileBrowserComponent implements OnInit {
 
   loadFiles() {
     const base = this.viewTrash ? `${this.auth.apiBase()}/files/trash/` : `${this.auth.apiBase()}/files/`;
-    this.http.get<any[]>(`${base}?project=${this.projectId}`).subscribe({ next: (list) => this.files = list, error: () => this.toast.error('Dateien laden fehlgeschlagen') });
+    let endpoint = `${base}?project=${this.projectId}`;
+    
+    // If accessing through shared route, only load files from externally shared folders
+    if (this.isSharedAccess) {
+      endpoint += '&shared_external=true';
+    }
+    
+    this.http.get<any[]>(endpoint).subscribe({ 
+      next: (list) => this.files = list, 
+      error: () => this.toast.error('Dateien laden fehlgeschlagen') 
+    });
   }
 
   download(f: any) {
@@ -195,5 +241,63 @@ export class FileBrowserComponent implements OnInit {
       : this.files.filter(f => Number(f.folder) === Number(this.selectedFolderId));
     const count = (q ? base.filter(f => (f.original_name || '').toLowerCase().includes(q)) : base).length;
     return Math.max(1, Math.ceil(count / this.pageSize));
+  }
+
+  getFileIcon(file: any): string {
+    const fileName = (file.original_name || '').toLowerCase();
+    const ext = fileName.split('.').pop();
+    
+    // Video files
+    if (['mp4', 'avi', 'mov', 'wmv', 'flv', 'webm', 'mkv'].includes(ext || '')) {
+      return 'bi-camera-video-fill';
+    }
+    
+    // Image files
+    if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico'].includes(ext || '')) {
+      return 'bi-image-fill';
+    }
+    
+    // Document files
+    if (['pdf'].includes(ext || '')) {
+      return 'bi-file-pdf-fill';
+    }
+    if (['doc', 'docx'].includes(ext || '')) {
+      return 'bi-file-word-fill';
+    }
+    if (['xls', 'xlsx'].includes(ext || '')) {
+      return 'bi-file-excel-fill';
+    }
+    if (['ppt', 'pptx'].includes(ext || '')) {
+      return 'bi-file-ppt-fill';
+    }
+    if (['txt', 'md', 'rtf'].includes(ext || '')) {
+      return 'bi-file-text-fill';
+    }
+    
+    // Archive files
+    if (['zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz'].includes(ext || '')) {
+      return 'bi-file-zip-fill';
+    }
+    
+    // Audio files
+    if (['mp3', 'wav', 'flac', 'aac', 'ogg', 'wma'].includes(ext || '')) {
+      return 'bi-file-music-fill';
+    }
+    
+    // Code files
+    if (['js', 'ts', 'html', 'css', 'scss', 'json', 'xml', 'yml', 'yaml', 'py', 'java', 'cpp', 'c', 'php', 'rb'].includes(ext || '')) {
+      return 'bi-file-code-fill';
+    }
+    
+    // Default file icon
+    return 'bi-file-earmark-fill';
+  }
+
+  formatFileSize(bytes: number): string {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
   }
 }

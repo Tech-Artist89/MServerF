@@ -1,81 +1,155 @@
-<div class="d-flex justify-content-between align-items-center mb-2">
-  <h3 class="mb-0">Projekt Dateien</h3>
-  <div class="btn-group">
-    <button class="btn btn-outline-light btn-sm" [class.active]="!viewTrash" (click)="viewTrash=false; loadFiles()"><i class="bi bi-folder2"></i> Dateien</button>
-    <button class="btn btn-outline-light btn-sm" [class.active]="viewTrash" (click)="viewTrash=true; loadFiles()"><i class="bi bi-trash"></i> Papierkorb</button>
-    <button class="btn btn-outline-danger btn-sm" *ngIf="viewTrash" (click)="purgeTrash()"><i class="bi bi-x-octagon"></i> Papierkorb leeren</button>
-  </div>
-</div>
-<!-- Ordner-Navigation -->
-<div class="mb-3" *ngIf="!viewTrash">
-  <div class="d-flex flex-wrap gap-2">
-    <button class="btn btn-sm" [ngClass]="selectedFolderId==null ? 'btn-primary' : 'btn-outline-light'" (click)="selectedFolderId=null; page=1">
-      <i class="bi bi-collection"></i> Alle
-    </button>
-    <button class="btn btn-sm" *ngFor="let fo of folders" [ngClass]="selectedFolderId===fo.id ? 'btn-primary' : 'btn-outline-light'" (click)="selectedFolderId=fo.id; page=1">
-      <i class="bi bi-folder2"></i> {{ fo.name }}
-    </button>
-  </div>
-  <div class="text-secondary small mt-1" *ngIf="selectedFolderId as fid">Angezeigt: {{ folderNameById(fid) }}</div>
-  <div class="text-secondary small mt-1" *ngIf="selectedFolderId==null">Angezeigt: Alle Dateien</div>
-</div>
-<div class="row g-2 mb-3">
-  <div class="col-md-6">
-    <input class="form-control" placeholder="Suchen (Dateiname)" [(ngModel)]="q" (ngModelChange)="page=1">
-  </div>
-  <div class="col-md-3">
-    <select class="form-select" [(ngModel)]="pageSize" (ngModelChange)="page=1">
-      <option [ngValue]="10">10 pro Seite</option>
-      <option [ngValue]="25">25 pro Seite</option>
-      <option [ngValue]="50">50 pro Seite</option>
-    </select>
-  </div>
-  <div class="col-md-3 text-end">
-    <div class="btn-group" role="group">
-      <button class="btn btn-outline-light" (click)="page=Math.max(1,page-1)" [disabled]="page<=1">Zurück</button>
-      <span class="btn btn-outline-secondary disabled">Seite {{page}} / {{ totalPages }}</span>
-      <button class="btn btn-outline-light" (click)="page=Math.min(totalPages,page+1)" [disabled]="page>=totalPages">Weiter</button>
-    </div>
-  </div>
-  <div class="col-12" *ngIf="!viewTrash">
-    <div class="input-group">
-      <select class="form-select" [(ngModel)]="selectedFolderId">
-        <option *ngFor="let fo of folders" [ngValue]="fo.id">{{ fo.name }}</option>
-      </select>
-      <input type="file" class="form-control" (change)="onFileSelected($event)">
-    </div>
-  </div>
-</div>
-<ul class="list-group">
-  <li class="list-group-item bg-dark text-light border-secondary" *ngFor="let f of filteredFiles">
-    <div class="d-flex justify-content-between align-items-center">
-      <span>
-        <i class="bi bi-file-earmark"></i>
-        <ng-container *ngIf="!f._renaming; else rn">
-          {{ f.original_name }}
-          <small class="text-secondary" *ngIf="f.folder">[{{ folderNameById(f.folder) }}]</small>
-        </ng-container>
-        <ng-template #rn>
-          <input class="form-control form-control-sm d-inline-block w-auto bg-dark text-light border-secondary" [(ngModel)]="f._newName">
-          <button class="btn btn-sm btn-success ms-1" (click)="rename(f)"><i class="bi bi-check-lg"></i></button>
-          <button class="btn btn-sm btn-outline-light ms-1" (click)="f._renaming=false"><i class="bi bi-x-lg"></i></button>
-        </ng-template>
-        <small class="text-secondary">({{ f.size }} B)</small>
-      </span>
-      <div class="btn-group btn-group-sm">
-        <button class="btn btn-outline-light" (click)="download(f)"><i class="bi bi-download"></i></button>
-        <label class="btn btn-outline-light mb-0" *ngIf="!viewTrash">
-          <i class="bi bi-arrow-repeat"></i>
-          <input type="file" class="d-none" (change)="replaceFile($event, f)">
-        </label>
-        <button class="btn btn-outline-light" (click)="openRenameModal(f)" *ngIf="!viewTrash"><i class="bi bi-pencil"></i></button>
-        <button class="btn btn-outline-danger" (click)="remove(f)" *ngIf="!viewTrash"><i class="bi bi-trash"></i></button>
-        <button class="btn btn-outline-success" (click)="restore(f)" *ngIf="viewTrash"><i class="bi bi-arrow-counterclockwise"></i></button>
-        <button class="btn btn-outline-danger" (click)="purge(f)" *ngIf="viewTrash"><i class="bi bi-x-octagon"></i></button>
+<div class="file-browser-container">
+  <!-- Header Section -->
+  <div class="browser-header">
+    <div class="header-title">
+      <button class="back-button" (click)="goBack()" title="Zurück zur Projektübersicht">
+        <i class="bi bi-arrow-left"></i>
+        <span>Zurück</span>
+      </button>
+      <div class="title-content">
+        <i class="bi bi-folder2-open"></i>
+        <h2>{{ projectName || 'Projekt Dateien' }}</h2>
       </div>
     </div>
-  </li>
-</ul>
+    <div class="view-controls">
+      <button class="view-btn" [class.active]="!viewTrash" (click)="viewTrash=false; loadFiles()">
+        <i class="bi bi-folder2"></i>
+        <span>Dateien</span>
+      </button>
+      <button class="view-btn" [class.active]="viewTrash" (click)="viewTrash=true; loadFiles()">
+        <i class="bi bi-trash"></i>
+        <span>Papierkorb</span>
+      </button>
+      <button class="view-btn danger" *ngIf="viewTrash" (click)="purgeTrash()">
+        <i class="bi bi-x-octagon"></i>
+        <span>Papierkorb leeren</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Folder Navigation - Always Visible -->
+  <div class="folders-section" *ngIf="!viewTrash">
+    <div class="section-title">
+      <i class="bi bi-folder"></i>
+      <h3>Ordner</h3>
+    </div>
+    <div class="folders-grid">
+      <button class="folder-card" [class.active]="selectedFolderId==null" (click)="selectedFolderId=null; page=1">
+        <div class="folder-icon">
+          <i class="bi bi-collection"></i>
+        </div>
+        <span class="folder-name">Alle Dateien</span>
+      </button>
+      <button class="folder-card" *ngFor="let fo of folders" [class.active]="selectedFolderId===fo.id" (click)="selectedFolderId=fo.id; page=1">
+        <div class="folder-icon">
+          <i class="bi bi-folder-fill"></i>
+        </div>
+        <span class="folder-name">{{ fo.name }}</span>
+      </button>
+    </div>
+    <div class="current-folder-info" *ngIf="selectedFolderId as fid">
+      <i class="bi bi-arrow-right"></i>
+      <span>Angezeigt: {{ folderNameById(fid) }}</span>
+    </div>
+    <div class="current-folder-info" *ngIf="selectedFolderId==null">
+      <i class="bi bi-arrow-right"></i>
+      <span>Angezeigt: Alle Dateien</span>
+    </div>
+  </div>
+  <!-- Files Section -->
+  <div class="files-section">
+    <div class="files-header">
+      <div class="section-title">
+        <i class="bi bi-files"></i>
+        <h3>Datei-Inhalte</h3>
+      </div>
+      <div class="files-controls">
+        <div class="search-box">
+          <i class="bi bi-search"></i>
+          <input class="form-control" placeholder="Suchen (Dateiname)" [(ngModel)]="q" (ngModelChange)="page=1">
+        </div>
+        <select class="form-select" [(ngModel)]="pageSize" (ngModelChange)="page=1">
+          <option [ngValue]="10">10 pro Seite</option>
+          <option [ngValue]="25">25 pro Seite</option>
+          <option [ngValue]="50">50 pro Seite</option>
+        </select>
+        <div class="pagination-controls">
+          <button class="btn-pagination" (click)="page=Math.max(1,page-1)" [disabled]="page<=1">
+            <i class="bi bi-chevron-left"></i>
+            <span>Zurück</span>
+          </button>
+          <div class="page-info">
+            <span>{{page}} / {{ totalPages }}</span>
+          </div>
+          <button class="btn-pagination" (click)="page=Math.min(totalPages,page+1)" [disabled]="page>=totalPages">
+            <span>Weiter</span>
+            <i class="bi bi-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upload Section -->
+    <div class="upload-section" *ngIf="!viewTrash">
+      <div class="upload-controls">
+        <select class="form-select" [(ngModel)]="selectedFolderId">
+          <option *ngFor="let fo of folders" [ngValue]="fo.id">{{ fo.name }}</option>
+        </select>
+        <label class="upload-btn">
+          <i class="bi bi-cloud-upload"></i>
+          <span>Dateien hochladen</span>
+          <input type="file" (change)="onFileSelected($event)" multiple>
+        </label>
+      </div>
+    </div>
+
+    <!-- Files Grid -->
+    <div class="files-grid">
+      <div class="file-card" *ngFor="let f of filteredFiles">
+        <div class="file-icon">
+          <i class="bi" [ngClass]="getFileIcon(f)"></i>
+        </div>
+        <div class="file-info">
+          <div class="file-name" *ngIf="!f._renaming; else rn">
+            <span class="name">{{ f.original_name }}</span>
+            <small class="folder-tag" *ngIf="f.folder">[{{ folderNameById(f.folder) }}]</small>
+          </div>
+          <ng-template #rn>
+            <div class="rename-controls">
+              <input class="form-control" [(ngModel)]="f._newName">
+              <button class="btn-icon success" (click)="rename(f)"><i class="bi bi-check-lg"></i></button>
+              <button class="btn-icon" (click)="f._renaming=false"><i class="bi bi-x-lg"></i></button>
+            </div>
+          </ng-template>
+          <div class="file-meta">
+            <span class="file-size">{{ formatFileSize(f.size) }}</span>
+          </div>
+        </div>
+        <div class="file-actions">
+          <button class="btn-icon" (click)="download(f)" title="Herunterladen">
+            <i class="bi bi-download"></i>
+          </button>
+          <label class="btn-icon" *ngIf="!viewTrash" title="Ersetzen">
+            <i class="bi bi-arrow-repeat"></i>
+            <input type="file" (change)="replaceFile($event, f)">
+          </label>
+          <button class="btn-icon" (click)="openRenameModal(f)" *ngIf="!viewTrash" title="Umbenennen">
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button class="btn-icon danger" (click)="remove(f)" *ngIf="!viewTrash" title="Löschen">
+            <i class="bi bi-trash"></i>
+          </button>
+          <button class="btn-icon success" (click)="restore(f)" *ngIf="viewTrash" title="Wiederherstellen">
+            <i class="bi bi-arrow-counterclockwise"></i>
+          </button>
+          <button class="btn-icon danger" (click)="purge(f)" *ngIf="viewTrash" title="Endgültig löschen">
+            <i class="bi bi-x-octagon"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Rename Modal -->
 <div class="modal fade" id="renameModal" tabindex="-1" aria-hidden="true">

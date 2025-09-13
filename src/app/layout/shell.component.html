@@ -1,28 +1,165 @@
-<div class="app-container d-flex flex-column min-vh-100">
-  <nav class="navbar navbar-expand navbar-dark bg-dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" routerLink="/">Mitra File Server</a>
-      <ul class="navbar-nav me-auto">
-        <li class="nav-item"><a class="nav-link" routerLink="/dashboard">Dashboard</a></li>
-        <li class="nav-item"><a class="nav-link" routerLink="/projects">Projekte</a></li>
-        <li class="nav-item dropdown" *ngIf="(auth.me()?.is_staff) || (auth.me()?.profile?.role === 'admin')">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Admin</a>
-          <ul class="dropdown-menu dropdown-menu-dark">
-            <li><a class="dropdown-item" routerLink="/admin/users">Benutzer</a></li>
-            <li><a class="dropdown-item" routerLink="/admin/companies">Firmen</a></li>
-            <li><a class="dropdown-item" routerLink="/admin/projects">Projekte</a></li>
-            <li><a class="dropdown-item" routerLink="/admin/audit-logs">Audit-Logs</a></li>
-          </ul>
+<div class="app-container d-flex min-vh-100">
+  <!-- Left Navigation Panel (20%) -->
+  <nav class="sidebar-nav">
+    <div class="nav-brand">
+      <i class="bi bi-hdd-stack text-primary"></i>
+      <span>Mitra File Server</span>
+    </div>
+    
+    <div class="nav-section">
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/projects" routerLinkActive="active">
+            <i class="bi bi-folder2-open"></i>
+            <span>Projekte</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/shared" routerLinkActive="active">
+            <i class="bi bi-share"></i>
+            <span>Shared</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/favorites" routerLinkActive="active">
+            <i class="bi bi-star"></i>
+            <span>Favoriten</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/trash" routerLinkActive="active">
+            <i class="bi bi-trash"></i>
+            <span>Papierkorb</span>
+          </a>
         </li>
       </ul>
-      <div class="d-flex" *ngIf="auth.isAuthenticated">
-        <span class="navbar-text me-3">{{ auth.me()?.username }}</span>
-        <button class="btn btn-outline-light btn-sm" (click)="auth.logout()">Logout</button>
+
+      <!-- Admin Section -->
+      <div class="admin-section" *ngIf="(auth.me()?.is_staff) || (auth.me()?.profile?.role === 'admin')">
+        <div class="admin-header" (click)="toggleAdminDropdown()">
+          <i class="bi bi-gear-fill"></i>
+          <span>Admin-Bereich</span>
+          <i class="bi bi-chevron-down dropdown-icon" [class.rotated]="adminDropdownOpen"></i>
+        </div>
+        <ul class="admin-dropdown" [class.open]="adminDropdownOpen">
+          <li><a class="dropdown-link" routerLink="/admin/users"><i class="bi bi-people"></i>Benutzer</a></li>
+          <li><a class="dropdown-link" routerLink="/admin/companies"><i class="bi bi-building"></i>Firmen</a></li>
+          <li><a class="dropdown-link" routerLink="/admin/projects"><i class="bi bi-briefcase"></i>Projekte</a></li>
+          <li><a class="dropdown-link" routerLink="/admin/audit-logs"><i class="bi bi-journal-text"></i>Audit-Logs</a></li>
+        </ul>
       </div>
     </div>
   </nav>
-  <main class="container my-4 flex-grow-1">
-    <router-outlet></router-outlet>
+
+  <!-- Main Content Area (55%) -->
+  <main class="main-content">
+    <div class="content-wrapper">
+      <router-outlet></router-outlet>
+    </div>
   </main>
+
+  <!-- Right Info Panel (25%) -->
+  <aside class="info-panel">
+    <!-- Logout Button -->
+    <div class="panel-header">
+      <button class="btn-logout" (click)="auth.logout()" *ngIf="auth.isAuthenticated">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Logout</span>
+      </button>
+    </div>
+
+    <!-- Storage Usage Section -->
+    <div class="storage-section">
+      <h5 class="section-title">
+        <i class="bi bi-hdd"></i>
+        Speicher-Nutzung
+      </h5>
+      <div class="storage-overview">
+        <div class="total-storage">
+          <div class="storage-bar">
+            <div class="storage-used" style="width: 68%"></div>
+          </div>
+          <div class="storage-text">
+            <span class="used">87.5 GB verwendet</span>
+            <span class="total">von 128 GB</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="storage-breakdown">
+        <div class="storage-item">
+          <div class="item-info">
+            <i class="bi bi-image text-success"></i>
+            <span class="item-name">Images</span>
+          </div>
+          <span class="item-size">12 GB</span>
+        </div>
+        <div class="storage-item">
+          <div class="item-info">
+            <i class="bi bi-file-text text-info"></i>
+            <span class="item-name">Documents</span>
+          </div>
+          <span class="item-size">512 MB</span>
+        </div>
+        <div class="storage-item">
+          <div class="item-info">
+            <i class="bi bi-file-zip text-warning"></i>
+            <span class="item-name">Archive</span>
+          </div>
+          <span class="item-size">20 GB</span>
+        </div>
+        <div class="storage-item">
+          <div class="item-info">
+            <i class="bi bi-camera-video text-primary"></i>
+            <span class="item-name">Media</span>
+          </div>
+          <span class="item-size">30 GB</span>
+        </div>
+        <div class="storage-item">
+          <div class="item-info">
+            <i class="bi bi-trash text-danger"></i>
+            <span class="item-name">Papierkorb</span>
+          </div>
+          <span class="item-size">45 GB</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upload Progress Section -->
+    <div class="upload-section">
+      <h5 class="section-title">
+        <i class="bi bi-cloud-upload"></i>
+        Upload-Status
+      </h5>
+      <div class="upload-queue">
+        <!-- Example upload items -->
+        <div class="upload-item">
+          <div class="upload-info">
+            <i class="bi bi-file-image"></i>
+            <span class="upload-name">vacation-photo.jpg</span>
+          </div>
+          <div class="upload-progress">
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 75%"></div>
+            </div>
+            <span class="progress-text">75%</span>
+          </div>
+        </div>
+        <div class="upload-item">
+          <div class="upload-info">
+            <i class="bi bi-file-pdf"></i>
+            <span class="upload-name">document.pdf</span>
+          </div>
+          <div class="upload-progress">
+            <div class="progress-bar">
+              <div class="progress-fill completed" style="width: 100%"></div>
+            </div>
+            <span class="progress-text">✓</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
   <app-toasts></app-toasts>
 </div>

@@ -1,10 +1,220 @@
-/* Styles for UsersAdminComponent */
+/* Users Admin Component - Modern Admin Interface 2025 */
 
-.table th {
-  white-space: nowrap;
+/* Enhanced table styling for admin */
+.table {
+  th {
+    white-space: nowrap;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.85);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(6, 182, 212, 0.05));
+    border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  
+  td {
+    vertical-align: middle;
+    
+    /* User avatar styling */
+    .user-avatar {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--bs-primary), var(--bs-info));
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: white;
+      font-size: 1rem;
+      margin-inline-end: var(--space-sm);
+    }
+    
+    /* Role badge styling */
+    .role-badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--border-radius-md);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      
+      &.admin {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+      }
+      
+      &.user {
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+        color: white;
+      }
+      
+      &.moderator {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+      }
+    }
+    
+    /* Status indicators */
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      
+      &::before {
+        content: '';
+        width: 0.5rem;
+        height: 0.5rem;
+        border-radius: 50%;
+        background: var(--bs-success);
+        animation: pulse 2s infinite;
+      }
+      
+      &.inactive::before {
+        background: var(--bs-danger);
+        animation: none;
+      }
+      
+      &.pending::before {
+        background: var(--bs-warning);
+      }
+    }
+  }
 }
 
+/* Enhanced form controls */
 .input-group.input-group-sm .form-control {
-  min-width: 160px;
+  min-width: 180px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-weight: 500;
+  
+  &:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--bs-primary);
+    box-shadow: var(--focus-ring);
+  }
+}
+
+/* Modern search and filter section */
+.admin-controls {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--border-radius-lg);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-xl);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  
+  .form-control, .form-select {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Action buttons group */
+  .btn-group {
+    .btn {
+      font-weight: 500;
+      
+      &.btn-outline-danger {
+        border-color: rgba(239, 68, 68, 0.5);
+        color: #fca5a5;
+        
+        &:hover {
+          background: rgba(239, 68, 68, 0.1);
+          border-color: rgba(239, 68, 68, 0.7);
+        }
+      }
+      
+      &.btn-outline-success {
+        border-color: rgba(34, 197, 94, 0.5);
+        color: #86efac;
+        
+        &:hover {
+          background: rgba(34, 197, 94, 0.1);
+          border-color: rgba(34, 197, 94, 0.7);
+        }
+      }
+    }
+  }
+}
+
+/* Pagination enhancement */
+.pagination-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--space-xl);
+  padding-top: var(--space-lg);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  
+  .results-info {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+}
+
+/* Modern modal styling for user details */
+.user-modal {
+  .modal-content {
+    background: rgba(15, 17, 21, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  
+  .modal-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    
+    .modal-title {
+      background: linear-gradient(135deg, #ffffff, #cbd5e1);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 600;
+    }
+  }
+  
+  .modal-body {
+    .form-label {
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.9);
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-sm);
+    }
+  }
+}
+
+/* Loading states */
+.table-loading {
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0),
+      rgba(255, 255, 255, 0.04),
+      rgba(255, 255, 255, 0)
+    );
+    animation: shimmer 1.5s infinite;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 

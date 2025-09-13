@@ -1,38 +1,70 @@
-<div class="row g-2 mb-3 align-items-center">
-  <div class="col">
-    <h2>Projekte</h2>
+<div class="projects-container">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="page-title">
+        <i class="bi" [ngClass]="pageIcon"></i>
+        <h1>{{ pageTitle }}</h1>
+      </div>
+      <div class="header-controls">
+        <div class="search-box">
+          <i class="bi bi-search"></i>
+          <input class="form-control" placeholder="Suchen (Name/Beschreibung)" [(ngModel)]="q" (ngModelChange)="page=1">
+        </div>
+        <select class="form-select page-size" [(ngModel)]="pageSize" (ngModelChange)="page=1">
+          <option [ngValue]="10">10 pro Seite</option>
+          <option [ngValue]="25">25 pro Seite</option>
+          <option [ngValue]="50">50 pro Seite</option>
+        </select>
+      </div>
+    </div>
+    
+    <!-- Pagination -->
+    <div class="pagination-wrapper">
+      <div class="pagination-controls">
+        <button class="btn-pagination" (click)="page=Math.max(1,page-1)" [disabled]="page<=1">
+          <i class="bi bi-chevron-left"></i>
+          <span>Zurück</span>
+        </button>
+        <div class="page-info">
+          <span>Seite {{page}} von {{ totalPages }}</span>
+        </div>
+        <button class="btn-pagination" (click)="page=Math.min(totalPages,page+1)" [disabled]="page>=totalPages">
+          <span>Weiter</span>
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+    </div>
   </div>
-  <div class="col-md-4 ms-auto">
-    <input class="form-control" placeholder="Suchen (Name/Beschreibung)" [(ngModel)]="q" (ngModelChange)="page=1">
-  </div>
-  <div class="col-md-2">
-    <select class="form-select" [(ngModel)]="pageSize" (ngModelChange)="page=1">
-      <option [ngValue]="10">10 pro Seite</option>
-      <option [ngValue]="25">25 pro Seite</option>
-      <option [ngValue]="50">50 pro Seite</option>
-    </select>
-  </div>
-  <div class="col-md-3 text-end">
-    <div class="btn-group" role="group">
-      <button class="btn btn-outline-light" (click)="page=Math.max(1,page-1)" [disabled]="page<=1">Zurück</button>
-      <span class="btn btn-outline-secondary disabled">Seite {{page}} / {{ totalPages }}</span>
-      <button class="btn btn-outline-light" (click)="page=Math.min(totalPages,page+1)" [disabled]="page>=totalPages">Weiter</button>
+
+  <!-- Projects Grid -->
+  <div class="projects-grid">
+    <div class="project-card" *ngFor="let p of filteredProjects">
+      <div class="project-header">
+        <div class="project-icon">
+          <i class="bi bi-folder-fill"></i>
+        </div>
+        <button class="favorite-btn" 
+                [class.active]="p.is_favorite" 
+                (click)="toggleFavorite(p)"
+                title="{{ p.is_favorite ? 'Aus Favoriten entfernen' : 'Zu Favoriten hinzufügen' }}">
+          <i class="bi" [ngClass]="p.is_favorite ? 'bi-star-fill' : 'bi-star'"></i>
+        </button>
+      </div>
+      <div class="project-content">
+        <h3 class="project-name">{{ p.name }}</h3>
+        <p class="project-description">{{ p.description }}</p>
+      </div>
+      <div class="project-actions">
+        <a [routerLink]="getProjectLink(p.id)" class="btn-primary" *ngIf="viewMode !== 'trash'">
+          <i class="bi bi-folder2-open"></i>
+          <span>Öffnen</span>
+        </a>
+        <button class="btn-secondary" (click)="restoreProject(p)" *ngIf="viewMode === 'trash'">
+          <i class="bi bi-arrow-clockwise"></i>
+          <span>Wiederherstellen</span>
+        </button>
+      </div>
     </div>
   </div>
 </div>
-<table class="table table-dark table-striped align-middle">
-  <thead>
-    <tr><th>Name</th><th>Beschreibung</th><th></th></tr>
-  </thead>
-    <tbody>
-      <tr *ngFor="let p of filteredProjects">
-      <td>{{ p.name }}</td>
-      <td>{{ p.description }}</td>
-      <td class="text-end">
-        <a [routerLink]="['/projects', p.id]" class="btn btn-sm btn-outline-light">
-          <i class="bi bi-folder2-open"></i> Öffnen
-        </a>
-      </td>
-    </tr>
-  </tbody>
-</table>

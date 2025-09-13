@@ -1,9 +1,52 @@
-/* Styles for DashboardComponent */
+/* Dashboard Component - 2025 Edition */
 
 .list-group-item {
-  transition: transform .06s ease;
+  transition: all var(--transition-fast);
+  border-radius: var(--border-radius-sm);
+  position: relative;
+  overflow: hidden;
+  
+  /* Enhanced hover with multiple effects */
+  &:hover {
+    transform: translateX(4px) translateY(-2px);
+    box-shadow: var(--shadow-elevation-2);
+    border-color: rgba(255,255,255,0.15);
+  }
+  
+  /* Modern focus styles */
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+  
+  /* Subtle micro-interaction */
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 3px;
+    background: linear-gradient(180deg, transparent, var(--bs-primary), transparent);
+    opacity: 0;
+    transition: opacity var(--transition-smooth);
+  }
+  
+  &:hover::before {
+    opacity: 1;
+  }
 }
-.list-group-item:hover {
-  transform: translateX(2px);
+
+/* Dashboard stats cards enhancement */
+.dashboard-stat-card {
+  background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: all var(--transition-smooth);
+  
+  &:hover {
+    transform: scale(1.02);
+    border-color: rgba(255,255,255,0.15);
+    box-shadow: var(--shadow-elevation-2);
+  }
 }
 

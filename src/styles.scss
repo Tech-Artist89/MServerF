@@ -1,10 +1,27 @@
-/* Global styles: modern dark theme */
+/* Global styles: modern dark theme - 2025 Edition */
 @use "sass:color";
 
 /*
   Bootstrap theming via SCSS overrides.
   We set variables BEFORE importing Bootstrap to generate a cohesive dark theme.
 */
+
+/* Modern CSS Custom Properties for dynamic theming */
+:root {
+  --transition-fast: 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow-elevation-1: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  --shadow-elevation-2: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-elevation-3: 0 10px 25px rgba(0, 0, 0, 0.35), 0 4px 10px rgba(0, 0, 0, 0.15);
+  --border-radius-sm: 0.5rem;
+  --border-radius-md: 0.75rem;
+  --border-radius-lg: 1rem;
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+}
 
 /* Core palette */
 $body-bg: #0f1115;
@@ -65,69 +82,283 @@ $navbar-padding-y: .75rem;
 /* Icons */
 @import "bootstrap-icons/font/bootstrap-icons.css";
 
-/* Global element tweaks */
-html, body { height: 100%; }
-:root { color-scheme: dark; }
+/* Global element tweaks - 2025 Standards */
+html, body { 
+  height: 100%; 
+  scroll-behavior: smooth;
+  /* Modern scroll padding for fixed headers */
+  scroll-padding-block-start: var(--space-xl);
+}
+
+:root { 
+  color-scheme: dark;
+  /* Improved focus indicators for accessibility */
+  --focus-ring: 0 0 0 2px rgba(59, 130, 246, 0.6);
+}
 
 body {
-  background: radial-gradient(1200px 800px at 85% -10%, rgba(59, 130, 246, 0.1), transparent 60%),
-              radial-gradient(900px 600px at -10% 10%, rgba(6, 182, 212, 0.08), transparent 60%),
-              $body-bg;
+  /* Modern gradient with better performance using layer compositing */
+  background: 
+    radial-gradient(ellipse 1400px 900px at 85% -10%, rgba(59, 130, 246, 0.12) 0%, transparent 65%),
+    radial-gradient(ellipse 1000px 700px at -15% 15%, rgba(6, 182, 212, 0.08) 0%, transparent 60%),
+    linear-gradient(180deg, #{$body-bg} 0%, #{color.scale($body-bg, $lightness: -2%)} 100%);
   color: $body-color;
+  /* Modern font smoothing for better readability */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "kern" 1, "liga" 1;
+  /* Improved container queries support */
+  container-type: size;
 }
 
-.app-container { min-height: 100vh; }
+.app-container { 
+  min-height: 100vh;
+  /* Modern logical properties for better RTL support */
+  margin-inline: auto;
+  max-inline-size: 100%;
+}
 
-/* Navigation */
+/* Navigation - Enhanced 2025 */
 .navbar.bg-dark {
-  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02) 60%, transparent) $dark !important;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  backdrop-filter: saturate(140%) blur(6px);
+  background: 
+    linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03) 70%, transparent),
+    #{$dark} !important;
+  border-block-end: 1px solid rgba(255,255,255,0.1);
+  /* Modern backdrop filter with better browser support */
+  backdrop-filter: saturate(160%) blur(8px);
+  -webkit-backdrop-filter: saturate(160%) blur(8px);
+  /* Improved shadow for depth */
+  box-shadow: var(--shadow-elevation-1);
 }
+
 .navbar .nav-link {
-  transition: color .15s ease, opacity .15s ease;
+  transition: all var(--transition-fast);
   opacity: .85;
+  border-radius: var(--border-radius-sm);
+  padding-inline: var(--space-md);
+  /* Modern focus styles */
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
 }
-.navbar .nav-link:hover, .navbar .nav-link:focus { opacity: 1; }
-.navbar .nav-link.active { color: $primary !important; }
-.navbar-brand { letter-spacing: .3px; }
 
-/* Cards and elevated surfaces */
+.navbar .nav-link:hover, 
+.navbar .nav-link:focus { 
+  opacity: 1; 
+  background-color: rgba(255,255,255,0.05);
+}
+
+.navbar .nav-link.active { 
+  color: $primary !important;
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.navbar-brand { 
+  letter-spacing: 0.025em;
+  font-weight: 600;
+  /* Modern text rendering */
+  text-rendering: optimizeLegibility;
+}
+
+/* Cards and elevated surfaces - Modern 2025 */
 .card, .modal-content, .dropdown-menu {
-  backdrop-filter: saturate(140%) blur(6px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, .45), 0 1px 0 rgba(255,255,255,.02) inset;
+  /* Enhanced backdrop filter with better performance */
+  backdrop-filter: saturate(150%) blur(12px);
+  -webkit-backdrop-filter: saturate(150%) blur(12px);
+  box-shadow: var(--shadow-elevation-3);
+  border-radius: var(--border-radius-md);
+  /* Modern borders with better contrast */
+  border: 1px solid rgba(255,255,255,0.12);
+  /* Subtle inner highlight */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.08), transparent 50%);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: xor;
+    pointer-events: none;
+  }
 }
 
-/* Lists & tables */
+/* Lists & tables - Enhanced */
 .list-group-item {
   background-color: $list-group-bg;
   border-color: $list-group-border-color;
-  transition: background-color .15s ease, border-color .15s ease;
+  transition: all var(--transition-smooth);
+  border-radius: var(--border-radius-sm);
+  /* Modern spacing using logical properties */
+  margin-block-end: var(--space-xs);
+  
+  &:hover { 
+    background-color: rgba(255,255,255,0.06);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-elevation-1);
+  }
+  
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
 }
-.list-group-item:hover { background-color: rgba(255,255,255,0.04); }
 
-.table { --bs-table-striped-color: #dde3ea; }
-.table > :not(caption) > * > * { border-color: $table-border-color; }
+.table { 
+  --bs-table-striped-color: #dde3ea;
+  /* Modern table styling */
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+}
 
-/* Forms */
+.table > :not(caption) > * > * { 
+  border-color: $table-border-color;
+  padding-block: var(--space-md);
+  padding-inline: var(--space-lg);
+}
+
+/* Forms - Enhanced 2025 */
 .form-control, .form-select, .input-group-text {
-  transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+  transition: all var(--transition-smooth);
+  border-radius: var(--border-radius-sm);
+  /* Modern focus styles */
+  &:focus, &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-color: $primary;
+  }
+  
+  /* Better invalid state styling */
+  &:invalid:not(:focus) {
+    border-color: rgba(239, 68, 68, 0.6);
+    box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.2);
+  }
 }
-.form-control::placeholder { color: $input-placeholder-color; }
 
-/* Buttons */
-.btn { transition: transform .04s ease, box-shadow .15s ease, background-color .15s ease, border-color .15s ease; }
-.btn:active { transform: translateY(1px); }
-.btn-outline-light { color: $light; border-color: rgba(255,255,255,0.35); }
-.btn-outline-light:hover { background-color: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.5); }
+.form-control::placeholder { 
+  color: $input-placeholder-color;
+  font-size: 0.95em;
+}
 
-/* Utilities */
+/* Enhanced floating labels */
+.form-floating > label {
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+/* Buttons - Modern 2025 */
+.btn { 
+  transition: all var(--transition-fast);
+  border-radius: var(--border-radius-sm);
+  font-weight: 500;
+  letter-spacing: 0.015em;
+  position: relative;
+  
+  /* Modern active state */
+  &:active { 
+    transform: scale(0.98);
+  }
+  
+  /* Enhanced focus styles */
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+  
+  /* Subtle hover animation */
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+}
+
+.btn-outline-light { 
+  color: $light; 
+  border-color: rgba(255,255,255,0.4);
+  
+  &:hover { 
+    background-color: rgba(255,255,255,0.1); 
+    border-color: rgba(255,255,255,0.6);
+  }
+}
+
+/* Utilities - Enhanced 2025 */
 .text-muted, .text-secondary { color: #9aa4b2 !important; }
-.border-subtle { border-color: rgba(255,255,255,0.08) !important; }
+.border-subtle { border-color: rgba(255,255,255,0.1) !important; }
 
-/* Scrollbars (WebKit) */
-*::-webkit-scrollbar { width: 10px; height: 10px; }
-*::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 8px; }
-*::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+/* Modern loading states */
+.loading {
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+    animation: shimmer 1.5s infinite;
+  }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Improved focus indicators for accessibility */
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* Modern scrollbars with better UX */
+* {
+  /* Modern scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.15) transparent;
+  
+  /* WebKit scrollbar styling */
+  &::-webkit-scrollbar { 
+    width: 8px; 
+    height: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: var(--border-radius-sm);
+  }
+  
+  &::-webkit-scrollbar-thumb { 
+    background: rgba(255,255,255,0.15); 
+    border-radius: var(--border-radius-sm);
+    border: 2px solid transparent;
+    background-clip: content-box;
+    
+    &:hover { 
+      background-color: rgba(255,255,255,0.25);
+      background-clip: content-box;
+    }
+  }
+}
+
+/* Container queries for responsive design */
+@container (max-width: 768px) {
+  .card {
+    margin-inline: var(--space-sm);
+  }
+  
+  .table-responsive {
+    font-size: 0.875rem;
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
