@@ -74,53 +74,67 @@
         <i class="bi bi-hdd"></i>
         Speicher-Nutzung
       </h5>
-      <div class="storage-overview">
+      <div class="storage-overview" *ngIf="storageStats">
         <div class="total-storage">
           <div class="storage-bar">
-            <div class="storage-used" style="width: 68%"></div>
+            <div class="storage-used" [style.width.%]="storageStats.usagePercentage"></div>
           </div>
           <div class="storage-text">
-            <span class="used">87.5 GB verwendet</span>
-            <span class="total">von 128 GB</span>
+            <span class="used">{{ formatFileSize(storageStats.usedSize) }} verwendet</span>
+            <span class="total">von {{ formatFileSize(storageStats.totalSize) }}</span>
           </div>
         </div>
       </div>
 
-      <div class="storage-breakdown">
-        <div class="storage-item">
+      <div class="storage-overview" *ngIf="!storageStats">
+        <div class="loading-placeholder">
+          <i class="bi bi-arrow-clockwise"></i>
+          Lade Speicherdaten...
+        </div>
+      </div>
+
+      <div class="storage-breakdown" *ngIf="storageStats">
+        <div class="storage-item" *ngIf="storageStats.breakdown.images > 0">
           <div class="item-info">
             <i class="bi bi-image text-success"></i>
-            <span class="item-name">Images</span>
+            <span class="item-name">Bilder</span>
           </div>
-          <span class="item-size">12 GB</span>
+          <span class="item-size">{{ formatFileSize(storageStats.breakdown.images) }}</span>
         </div>
-        <div class="storage-item">
+        <div class="storage-item" *ngIf="storageStats.breakdown.documents > 0">
           <div class="item-info">
             <i class="bi bi-file-text text-info"></i>
-            <span class="item-name">Documents</span>
+            <span class="item-name">Dokumente</span>
           </div>
-          <span class="item-size">512 MB</span>
+          <span class="item-size">{{ formatFileSize(storageStats.breakdown.documents) }}</span>
         </div>
-        <div class="storage-item">
+        <div class="storage-item" *ngIf="storageStats.breakdown.archives > 0">
           <div class="item-info">
             <i class="bi bi-file-zip text-warning"></i>
             <span class="item-name">Archive</span>
           </div>
-          <span class="item-size">20 GB</span>
+          <span class="item-size">{{ formatFileSize(storageStats.breakdown.archives) }}</span>
         </div>
-        <div class="storage-item">
+        <div class="storage-item" *ngIf="storageStats.breakdown.media > 0">
           <div class="item-info">
             <i class="bi bi-camera-video text-primary"></i>
-            <span class="item-name">Media</span>
+            <span class="item-name">Medien</span>
           </div>
-          <span class="item-size">30 GB</span>
+          <span class="item-size">{{ formatFileSize(storageStats.breakdown.media) }}</span>
         </div>
-        <div class="storage-item">
+        <div class="storage-item" *ngIf="storageStats.breakdown.trash > 0">
           <div class="item-info">
             <i class="bi bi-trash text-danger"></i>
             <span class="item-name">Papierkorb</span>
           </div>
-          <span class="item-size">45 GB</span>
+          <span class="item-size">{{ formatFileSize(storageStats.breakdown.trash) }}</span>
+        </div>
+        <div class="storage-item" *ngIf="storageStats.breakdown.other > 0">
+          <div class="item-info">
+            <i class="bi bi-file-earmark text-secondary"></i>
+            <span class="item-name">Andere</span>
+          </div>
+          <span class="item-size">{{ formatFileSize(storageStats.breakdown.other) }}</span>
         </div>
       </div>
     </div>
@@ -131,31 +145,46 @@
         <i class="bi bi-cloud-upload"></i>
         Upload-Status
       </h5>
-      <div class="upload-queue">
-        <!-- Example upload items -->
-        <div class="upload-item">
+
+      <!-- Active uploads -->
+      <div class="upload-queue" *ngIf="activeUploads && activeUploads.length > 0">
+        <div class="upload-item" *ngFor="let upload of activeUploads">
           <div class="upload-info">
-            <i class="bi bi-file-image"></i>
-            <span class="upload-name">vacation-photo.jpg</span>
+            <i class="bi" [ngClass]="getUploadIcon(upload.fileType)"></i>
+            <span class="upload-name">{{ upload.fileName }}</span>
+            <button class="cancel-upload"
+                    *ngIf="upload.status === 'uploading' || upload.status === 'pending'"
+                    (click)="cancelUpload(upload.id)"
+                    title="Upload abbrechen">
+              <i class="bi bi-x"></i>
+            </button>
           </div>
           <div class="upload-progress">
             <div class="progress-bar">
-              <div class="progress-fill" style="width: 75%"></div>
+              <div class="progress-fill"
+                   [ngClass]="{
+                     'completed': upload.status === 'completed',
+                     'error': upload.status === 'error'
+                   }"
+                   [style.width.%]="upload.progress"></div>
             </div>
-            <span class="progress-text">75%</span>
+            <span class="progress-text">
+              <ng-container [ngSwitch]="upload.status">
+                <span *ngSwitchCase="'completed'">✓</span>
+                <span *ngSwitchCase="'error'" title="{{ upload.errorMessage }}">⚠</span>
+                <span *ngSwitchCase="'pending'">Warteschlange</span>
+                <span *ngSwitchDefault>{{ upload.progress }}%</span>
+              </ng-container>
+            </span>
           </div>
         </div>
-        <div class="upload-item">
-          <div class="upload-info">
-            <i class="bi bi-file-pdf"></i>
-            <span class="upload-name">document.pdf</span>
-          </div>
-          <div class="upload-progress">
-            <div class="progress-bar">
-              <div class="progress-fill completed" style="width: 100%"></div>
-            </div>
-            <span class="progress-text">✓</span>
-          </div>
+      </div>
+
+      <!-- No uploads message -->
+      <div class="no-uploads" *ngIf="!activeUploads || activeUploads.length === 0">
+        <div class="empty-state">
+          <i class="bi bi-cloud-upload"></i>
+          <span>Keine aktiven Uploads</span>
         </div>
       </div>
     </div>

@@ -67,6 +67,11 @@ export class FileBrowserComponent implements OnInit {
     }
   }
 
+  goToPapierkorb() {
+    // Navigate to the main navigation Papierkorb tab
+    this.router.navigate(['/projects'], { queryParams: { view: 'trash' } });
+  }
+
   loadFolders() {
     let endpoint = `${this.auth.apiBase()}/folders/?project=${this.projectId}`;
     
@@ -203,7 +208,13 @@ export class FileBrowserComponent implements OnInit {
     if (!confirm('Datei wirklich löschen?')) return;
     // Soft-Delete
     this.http.delete(`${this.auth.apiBase()}/files/${f.id}/`)
-      .subscribe({ next: () => { this.toast.success('Datei in den Papierkorb verschoben'); this.loadFiles(); }, error: () => this.toast.error('Löschen fehlgeschlagen') });
+      .subscribe({
+        next: () => {
+          this.toast.success('Datei in den Papierkorb verschoben');
+          this.loadFiles();
+        },
+        error: () => this.toast.error('Löschen fehlgeschlagen')
+      });
   }
 
   restore(f: any) {

@@ -7,6 +7,10 @@
         <h1>{{ pageTitle }}</h1>
       </div>
       <div class="header-controls">
+        <button class="purge-all-btn" *ngIf="viewMode === 'trash'" (click)="purgeAllTrash()" title="Papierkorb komplett leeren">
+          <i class="bi bi-x-octagon-fill"></i>
+          <span>Papierkorb leeren</span>
+        </button>
         <div class="search-box">
           <i class="bi bi-search"></i>
           <input class="form-control" placeholder="Suchen (Name/Beschreibung)" [(ngModel)]="q" (ngModelChange)="page=1">
@@ -64,6 +68,26 @@
           <i class="bi bi-arrow-clockwise"></i>
           <span>Wiederherstellen</span>
         </button>
+      </div>
+
+      <!-- Deleted Files Section for Trash View -->
+      <div class="deleted-files-section" *ngIf="viewMode === 'trash' && p.deleted_files?.length">
+        <h4 class="deleted-files-title">
+          <i class="bi bi-file-earmark-x"></i>
+          Gelöschte Dateien ({{ p.deleted_files.length }})
+        </h4>
+        <div class="deleted-files-list">
+          <div class="deleted-file-item" *ngFor="let file of p.deleted_files">
+            <div class="file-info">
+              <i class="bi bi-file-earmark"></i>
+              <span class="file-name">{{ file.original_name }}</span>
+              <small class="file-size">{{ formatFileSize(file.size) }}</small>
+            </div>
+            <button class="restore-file-btn" (click)="restoreFile(file)" title="Datei wiederherstellen">
+              <i class="bi bi-arrow-counterclockwise"></i>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
